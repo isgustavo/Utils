@@ -11,7 +11,9 @@ namespace odt.util
     {
         NONE,
         HORIZONTAL,
-        VERTICAL
+        VERTICAL,
+        MOUSE_X,
+        MOUSE_Y
     }
 
     public class CustomInput
@@ -55,6 +57,20 @@ namespace odt.util
                         vertical = virtualInput.GetAxis(axis);
                     }
                     return vertical;
+                case Axis.MOUSE_X:
+                    float mouseX = Input.GetAxis("Mouse X");
+                    if (Mathf.Abs(mouseX) < 0.01f)
+                    {
+                        mouseX = virtualInput.GetAxis(axis);
+                    }
+                    return mouseX;
+                case Axis.MOUSE_Y:
+                    float mouseY = Input.GetAxis("Mouse Y");
+                    if (Mathf.Abs(mouseY) < 0.01f)
+                    {
+                        mouseY = virtualInput.GetAxis(axis);
+                    }
+                    return mouseY;
                 default:
                     return 0;
             }

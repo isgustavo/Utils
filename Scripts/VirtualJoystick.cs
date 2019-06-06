@@ -19,8 +19,8 @@ namespace odt.util
 
         void Start()
         {
-            joystickImage = GameObject.Find("VirtualButton").GetComponent<Image>();
-            handleImage = GameObject.Find("Handle").GetComponent<Image>();
+            joystickImage = transform.Find("VirtualButton").GetComponent<Image>();
+            handleImage = joystickImage.transform.Find("Handle").GetComponent<Image>();
         }
 
         public void OnPointerDown(PointerEventData eventData)
