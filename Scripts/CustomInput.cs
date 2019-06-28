@@ -5,6 +5,8 @@ namespace odt.util
     public interface IVirtualInput
     {
         float GetAxis(Axis axis);
+
+        bool GetButtonDown(Buttons button);
     }
 
     public enum Axis
@@ -14,6 +16,12 @@ namespace odt.util
         VERTICAL,
         MOUSE_X,
         MOUSE_Y
+    }
+
+    public enum Buttons
+    {
+        NONE,
+        BUTTON_A
     }
 
     public class CustomInput
@@ -26,7 +34,7 @@ namespace odt.util
         {
             get
             {
-                if(input == null)
+                if (input == null)
                 {
                     input = new CustomInput();
                 }
@@ -37,6 +45,11 @@ namespace odt.util
         private CustomInput()
         {
             virtualInput = GameObject.FindGameObjectWithTag("VirtualInput").GetComponent<IVirtualInput>();
+        }
+
+        public bool HasHorizontalOrVerticalInput()
+        {
+            return Mathf.Abs(GetAxis(Axis.HORIZONTAL)) + Mathf.Abs(GetAxis(Axis.VERTICAL)) > 0f;
         }
 
         public float GetAxis(Axis axis)
@@ -73,6 +86,22 @@ namespace odt.util
                     return mouseY;
                 default:
                     return 0;
+            }
+        }
+
+        public bool GetButton(Buttons button)
+        {
+            switch (button)
+            {
+                case Buttons.BUTTON_A:
+                    bool b = Input.GetButtonDown("Fire1");
+                    if (!b)
+                    {
+                        b = virtualInput.GetButtonDown(button);
+                    }
+                    return b;
+                default:
+                    return false;
             }
         }
     }

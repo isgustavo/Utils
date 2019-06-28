@@ -3,57 +3,43 @@ using UnityEngine;
 
 namespace odt.util
 {
+    public static class Extension
+    {
+        public static Vector3 PoolPosition(this Vector3 param)
+        {
+            return new Vector3(-200, -200, -200);
+        }
+    }
+
     public class PrefabLocalPool
     {
-        private static PrefabLocalPool pool;
+        private List<GameObject> pool;
 
-        public static PrefabLocalPool GetOrCreateLocalPool(GameObject prefab, Transform parent, int size = 1)
+        public PrefabLocalPool(GameObject prefab, int prewarm = 0)
         {
-            if (pool == null)
-            {
-                pool = new PrefabLocalPool(prefab, parent, size);
-            }
-
-            return pool;
+            pool = new List<GameObject>();
+            Initialize(prefab, prewarm);
         }
 
-        private Dictionary<int, List<GameObject>> poolDictionary;
-
-        private PrefabLocalPool(GameObject prefab, Transform parent, int size)
+        private void Initialize(GameObject prefab, int prewarm)
         {
-            if (poolDictionary == null)
+            for (int i = 0; i < prewarm; i++)
             {
-                poolDictionary = new Dictionary<int, List<GameObject>>();
-            }
-
-            Initialize(prefab, parent, size);
-
-        }
-
-        private void Initialize(GameObject prefab, Transform parent, int size)
-        {
-            if (!poolDictionary.ContainsKey(prefab.GetHashCode()))
-            {
-                List<GameObject> prefabs = new List<GameObject>();
-                for (int i = 0; i < size; i++)
-                {
-                    GameObject newObj = Object.Instantiate(prefab, Vector3.zero, Quaternion.identity, parent);
-                    newObj.SetActive(false);
-                    prefabs.Add(newObj);
-                }
-                poolDictionary.Add(prefab.GetHashCode(), prefabs);
+                GameObject newObj = Object.Instantiate(prefab, new Vector3().PoolPosition(), Quaternion.identity);
+                newObj.SetActive(false);
+                pool.Add(newObj);
             }
         }
 
-        public GameObject Spawn(int hashCode, Vector3 position, Quaternion rotation)
+        public GameObject Spawn(Vector3 position, Quaternion rotation)
         {
-            if (!poolDictionary.ContainsKey(hashCode))
+            if(pool.Count <= 0)
             {
-                Debug.LogWarning($"Pool not found : [{hashCode.ToString()}]");
+                Debug.LogWarning($"Pool empty");
                 return null;
             }
 
-            foreach (GameObject obj in poolDictionary[hashCode])
+            foreach (GameObject obj in pool)
             {
                 if (!obj.activeInHierarchy)
                 {
@@ -64,28 +50,18 @@ namespace odt.util
                 }
             }
 
-            Debug.LogWarning($"Object not available on Pool : [{hashCode.ToString()}]");
+            Debug.LogWarning($"Object not available on Pool : [{pool[0].ToString()}]");
             return null;
         }
 
-        public GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
+        public void Despawn(GameObject gameObject)
         {
-            return Spawn(prefab.GetHashCode(), position, rotation);
-        }
-
-        public void Despawn(int hashCode, GameObject gameObject)
-        {
-            if (!poolDictionary.ContainsKey(hashCode))
+            foreach (GameObject obj in pool)
             {
-                Debug.LogWarning($"Pool not found : [{hashCode.ToString()}]");
-                return;
-            }
-
-            foreach (GameObject obj in poolDictionary[hashCode])
-            {
-                if (obj.name.GetHashCode() == gameObject.name.GetHashCode())
+                if (obj == gameObject)
                 {
                     gameObject.SetActive(false);
+                    return;
                 }
             }
         }

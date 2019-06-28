@@ -6,11 +6,13 @@ namespace odt.util
     {
         private VirtualJoystick virtualJoystick;
         private VirtualDrag virtualDrag;
+        private VirtualButton virtualButtonA;
 
         private void Start()
         {
             virtualJoystick = GetComponentInChildren<VirtualJoystick>();
             virtualDrag = GetComponentInChildren<VirtualDrag>();
+            virtualButtonA = GetComponentInChildren<VirtualButtonA>();
         }
 
         public float GetAxis(Axis axis)
@@ -27,6 +29,17 @@ namespace odt.util
                     return virtualDrag.Vertical;
                 default:
                     return 0;
+            }
+        }
+
+        public bool GetButtonDown(Buttons button)
+        {
+            switch (button)
+            {
+                case Buttons.BUTTON_A:
+                    return virtualButtonA.IsDown;
+                default:
+                    return false;
             }
         }
     }
