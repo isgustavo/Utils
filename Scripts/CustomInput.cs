@@ -27,10 +27,11 @@ namespace odt.util
     public class CustomInput
     {
         private IVirtualInput virtualInput;
+        private bool hasTouchInput;
 
         private static CustomInput input;
 
-        public static CustomInput InputBy
+        public static CustomInput Instance
         {
             get
             {
@@ -44,7 +45,16 @@ namespace odt.util
 
         private CustomInput()
         {
-            virtualInput = GameObject.FindGameObjectWithTag("VirtualInput").GetComponent<IVirtualInput>();
+            GameObject gameObject = GameObject.FindGameObjectWithTag("VirtualInput");
+            if(gameObject != null)
+            {
+                virtualInput = gameObject.GetComponent<IVirtualInput>();
+                hasTouchInput = true;
+            } else
+            {
+                Debug.LogWarning("Virtual Input component not found");
+                hasTouchInput = false;
+            }
         }
 
         public bool HasHorizontalOrVerticalInput()
@@ -58,28 +68,28 @@ namespace odt.util
             {
                 case Axis.HORIZONTAL:
                     float horizontal = Input.GetAxis("Horizontal");
-                    if (Mathf.Abs(horizontal) < 0.01f)
+                    if (hasTouchInput && Mathf.Abs(horizontal) < 0.01f)
                     {
                         horizontal = virtualInput.GetAxis(axis);
                     }
                     return horizontal;
                 case Axis.VERTICAL:
                     float vertical = Input.GetAxis("Vertical");
-                    if (Mathf.Abs(vertical) < 0.01f)
+                    if (hasTouchInput && Mathf.Abs(vertical) < 0.01f)
                     {
                         vertical = virtualInput.GetAxis(axis);
                     }
                     return vertical;
                 case Axis.MOUSE_X:
                     float mouseX = Input.GetAxis("Mouse X");
-                    if (Mathf.Abs(mouseX) < 0.01f)
+                    if (hasTouchInput && Mathf.Abs(mouseX) < 0.01f)
                     {
                         mouseX = virtualInput.GetAxis(axis);
                     }
                     return mouseX;
                 case Axis.MOUSE_Y:
                     float mouseY = Input.GetAxis("Mouse Y");
-                    if (Mathf.Abs(mouseY) < 0.01f)
+                    if (hasTouchInput && Mathf.Abs(mouseY) < 0.01f)
                     {
                         mouseY = virtualInput.GetAxis(axis);
                     }

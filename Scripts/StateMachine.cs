@@ -15,6 +15,12 @@ namespace odt.util
             this.states = states;
         }
 
+        public StateMachine(Dictionary<string, State> states, string initialState)
+        {
+            this.states = states;
+            ChangeState(initialState);
+        }
+
         public void OnUpdate()
         {
             CurrentState?.OnUpdateState();
